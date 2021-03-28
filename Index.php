@@ -3,17 +3,34 @@
     {
         display: flex;
         flex-wrap: wrap;
-        gap: 50px;
+        gap: 30px;
         margin: 50px;
     }
     .product
     {
         border: 2px solid black;
-        width: 150px;
-        font-size: 12px;
+        width: 200px;
+        font-size: 15px;
         text-align:center;
         position: relative;
+        padding: 10px;
+        gap: 3px;
     }
+    .checkbox
+    {
+        position: absolute;
+        left: 5px;
+        top: 5px;        
+    }
+    .productType
+    {
+        position:relative;
+    }
+    .productType p
+    {
+        display: inline-block;
+    }
+    
     .head
     {
         width:100%;
@@ -30,12 +47,7 @@
         right: 10px;
         top: 10px;
     }
-    .checkbox
-    {
-        position: absolute;
-        left: 5px;
-        top: 5px;        
-    }
+   
 </style>
 
 <!DOCTYPE html>
@@ -76,10 +88,14 @@
                     while($row=mysqli_fetch_array($result)): ?>
                         <div class="product">
                                     <input class="checkbox" type="checkbox" name="checkbox[]" value="<?= $row["id"] ?>">
-                                    <h3><?= $row["sku"] ?></h3>
-                                    <h3><?= $row["productName"] ?></h3>
-                                    <h3><?= $row["price"] ?></h3>
-                                    <h3><?= $row["parametrs"] ?></h3>
+                                    <p><?= $row["sku"] ?></p>
+                                    <p><?= $row["productName"] ?></p>
+                                    <p><?= $row["price"] ?>$</p>
+                                    <div class="productType">
+                                        <p><?= $row["productType"] ?></p>
+                                        <p>:</p>
+                                        <p ><?= $row["parametrs"] ?></p>
+                                    </div>
                         </div>
                     <?php      
                     endwhile;   

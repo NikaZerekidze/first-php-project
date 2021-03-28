@@ -1,12 +1,18 @@
 <style>
+   
     .form div
     {
         display: flex;
-        margin: 30px;    
+        margin: 30px;   
+    }
+    h2
+    {
+        margin-right: 20px;
     }
     input
     {
         margin: 20px;
+        width: 100px;
     }
     select
     {
@@ -23,126 +29,15 @@
     {
         color: red;
     }
+    #submit
+    {
+        margin-left: 30px;
+    }
+    
 
 </style>
 
 
-<?php
-    require_once "Database.php";
-
-    $sku="";
-    $name="";
-    $price="";
-    $selection="";
-    $property="";
-    $sku_err=$name_err=$price_err=$select_err=$property_err="";
-
-    if($_SERVER["REQUEST_METHOD"] == "POST")
-    {
-        $sku = test_input($_POST["sku"]);
-        if(empty($sku))
-        {
-            $sku_err="please enter a sku code";
-        }
-
-        $name = test_input($_POST["name"]);
-        if(empty($name))
-        {
-            $name_err="please enter a name";
-        }
-        elseif(!filter_var($name, FILTER_VALIDATE_REGEXP, array("options"=>["regexp"=>"/^([a-zA-Z' ]+)$/"]) ) )
-        {
-            $name_err="please valid a name";
-        }
-
-        $price = test_input($_POST["price"]);
-        if(empty($price))
-        {
-            $price_err="please enter a price";
-        }
-        elseif(!ctype_digit($price))
-        {
-            $price_err="please enter a positive integer value";
-        }
-
-        $selection = test_input($_POST["selection"]);
-
-        //////
-
-        
-        // if(class_exists('foo')) {
-        // $html = file_get_html('http://localhost/firstPHPproject/Upload.php');
-        // $Dimensions = $html->find("div#Dimensions");
-
-        $funitureProp=array();
-
-        if(isset($_POST['Dimensions']))
-        {
-            // if(!ctype_digit($property))
-            // {
-            //     $property_err="please enter a positive integer value";
-            // }
-
-            array_push($funitureProp,$_POST['property'],$_POST['property'],$_POST['property']);
-            
-            list($a, $b, $c) = $funitureProp;
-            $props="$a X $b X $c";
-            $property=$props;
-            
-            if(empty($property))
-            {
-                $property_err="please enter property";
-            }  
-
-        }
-        else
-        {
-            $property=test_input($_POST["property"]);
-            if(empty($property))
-            {
-                $property_err="please enter property";
-            }
-            elseif(!ctype_digit($property))
-            {
-                $property_err="please enter a positive integer value";
-            }
-
-        }
-
-      ///////problema!!! poroperty is marto bolo mnishvnelobas achvenebs,
-      //// gaertianeba daxatvashi iqneba problema gamosavali?
-
-        if(empty($sku_err) && empty($name_err) && empty($price_err) && empty($property_err) && empty($property_err))
-        {
-            $sql="INSERT INTO productdata (sku, productName, price, productType, parametrs) VALUE (?,?,?,?,?)";
-            if($stmt=mysqli_prepare($conn, $sql))
-            {
-                mysqli_stmt_bind_param($stmt,"sssss",$sku,$name,$price,$selection,$property);
-                if(mysqli_stmt_execute($stmt))
-                {
-                    header("location: Index.php");
-                    exit();
-                }
-                else
-                {
-                    echo "somthing went wrong";
-                }
-            }
-            mysqli_stmt_close($stmt);
-        }
-        mysqli_close($conn);
-    }
-
-    function test_input($data)
-    {
-        $data = trim($data);
-        $data = stripslashes($data);
-        $data = htmlspecialchars($data);
-        return $data;
-    }
-
-
-?>
 
 <!DOCTYPE html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -157,78 +52,84 @@
         <link rel="stylesheet" href="">
     </head>
     <body>
-
         <h1>Product Add</h1>
         <hr>
-        <form class="form" action="<?= htmlspecialchars($_SERVER["PHP_SELF"])?>" method="POST">
-            <div class="form-group">
+        <form id="form" class="form " action="" method="POST">
+            <div class="form-group w-50">
                 <h2>SKU</h2> 
-                <input class="form-control" type="text" name="sku" value="<?= $sku ?>">
-                <span class="error">* <?= $sku_err ?></span>
+                <input class="form-control " id="sku" type="text" name="sku" action="<?= htmlspecialchars($_SERVER["PHP_SELF"])?>" >
+                <span id="skuerror" class="error">*</span>
               
             </div>
-            <div class="form-group">
+            <div class="form-group w-50">
                 <h2>Name</h2> 
-                <input class="form-control"  type="text" name="name" value="<?= $name ?>">
-                <span class="error">*<?= $name_err ?></span>
+                <input class="form-control"  id="name" type="text" name="name" >
+                <span id="nameerror" class="error">*</span>
             </div>
-            <div class="form-group">
+            <div class="form-group w-50">
                 <h2>Price</h2> 
-                <input  class="form-control"  type="text" name="price" value="<?= $price ?>">
-                <span class="error">* <?= $price_err ?></span>
+                <input  class="form-control"  id="price"  type="text" name="price" >
+                <span id="priceerror" class="error"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group w-50">
                 <h2>Type</h2> 
-                <select name="selection"  class="form-control" >
+                <select id="selection" name="selection"  class="form-control" >
+                    <option id="default" value="Choose">choose</option>
                     <option value="Weight">Book</option>
                     <option value="Dimensions">Furniture</option>
                     <option value="Size">DVD-disc</option>
                 </select>
-                <span class="error">* <?= $select_err ?> </span>
+                <span id="selecterror" class="error">*  </span>
 
             </div>
 
             <div class='special' id="special">
-                                <div  class="form-group" id="Weight" >
-                                    <h2>Weight</h2>
-                                    <input  class="form-control"  type="text"  name="property" >
-                                    <span class="error"> * <?= $property_err ?></span>
-                                </div>
+                              
             </div>
 
-            <input class="btn btn-primary" type="submit" value="save">
+            <input class="btn btn-primary" id="submit" type="submit" value="save">
+            <span id="err" class="error"></span>
 
         </form>
-
+        <form id="cancelform" class="form">
+            <input class="btn btn-primary" id="submit" type="submit" value="cancel">
+        </form>
+        <span id="reslut"></span>
         <script>
 
-                let Size=  '<div class="form-group" id="Size" >'+
+                $("#cancelform").submit(function(event){ 
+                    event.preventDefault();
+                    window.location.replace("http://localhost/firstPHPproject/Index.php");
+                 })
+        
+
+        
+
+                let Size=  '<div class="form-group w-50" id="SizeDiv" >'+
                                 '<h2>Size</h2>'+
-                                '<input  class="form-control"  type="text" name="property"  value="<?= $property ?>" >'+
-                                '<span class="error"> *<?= $property_err ?></span>'+
+                                '<input id="Size" class="form-control"  type="text" name="property"   >'+
+                                '<span id="propertyerror" class="error"> *</span>'+
 
                             '</div>'
                 
-                let Weight=   '<div  class="form-group" id="Weight"  >'+
+                let Weight=   '<div  class="form-group w-50" id="WeightDiv"  >'+
                                     '<h2>Weight</h2>'+
-                                    '<input  class="form-control"  type="text"  name="property" value="<?= $property ?>">'+
-                                    '<span class="error"> * <?= $property_err ?></span>'+
+                                    '<input  id="Weight"  class="form-control"  type="text"  name="property" >'+
+                                    '<span  id="propertyerror" class="error"> * </span>'+
                                '</div>' 
                 
-                let Dimensions=  '<div   class="form-group" id="Dimensions"  >'+
-                                        '<input type="hidden" name="Dimensions" >'+
+                let Dimensions=  '<div   class="form-group " id="DimensionsDiv"  >'+
+                                        '<input type="hidden" name="prop" >'+
                                         '<h2>Height</h2>'+
-                                        '<input  class="form-control"  type="text"  value="" name="property"  value="<?= $property ?>">'+
+                                        '<input  id="Height" class="form-control"  type="text"  value="" name="property" >'+
                                         '<h2>Width</h2>'+
-                                        '<input  class="form-control"  type="text"  value="" name="property"  value="<?= $property ?>">'+
+                                        '<input id="Width" class="form-control"  type="text"  value="" name="property"  >'+
                                         '<h2>Length</h2>'+
-                                        '<input  class="form-control"  type="text" value="" name="property"  value="<?= $property ?>">'+
-                                        '<span class="error"> * <?= $property_err ?></span>'+
+                                        '<input id="Length" class="form-control"  type="text" value="" name="property">'+
+                                        '<span id="propertyerror" class="error"> * </span>'+
                                  '</div>'
                 
-                // $('#special').append($(Weight));
-
-
+                var property="";
                 $('select').on('change', function(e) {
                 let value = $(this).val();
                 let val = value.toString();
@@ -238,18 +139,73 @@
                 switch (val){
                     case 'Size':
                         $('#special').append($(Size));
+                        var property = "Size";
                         break;
                     case 'Weight':
                         $('#special').append($(Weight));
+                        var property = "Weight";
+
                         break;
                     case 'Dimensions':
                         $('#special').append($(Dimensions));
                         break;
                     default:
-                        $('#special').append($(weight));
+                        $('#default');
                 }
-            
-     
+                $(document).ready(function(){
+                    $("#form").submit(function(event){     
+
+                        if($("#DimensionsDiv").length !== 0)
+                        {
+                            let inputvalue= {"Height":$("#Height").val(),"Width":$("#Width").val(),"Length":$("#Length").val()};
+                            var inputVal =JSON.stringify(inputvalue);
+                            console.log(inputVal);
+                        }
+                        else
+                        {   
+                            var inputVal = $( "#"+ property).val();
+                            console.log(inputVal);
+                            console.log(typeof(inputVal))
+
+                        }
+
+      
+
+                        event.preventDefault();
+                        $.ajax({
+                            url:"Validate.php",
+                            type:"post",
+                            cache: false,
+                            data: {sku: $( "#sku" ).val(), name: $( "#name" ).val(), price: $( "#price" ).val(), property : inputVal, selection: $( "#selection" ).val()},
+                            success:function(result)
+                            {           
+                               try{ 
+                                   var errors = JSON.parse(result);
+                                   $("#skuerror").html(errors.sku_err);
+                                    $("#nameerror").html(errors.name_err);
+                                    $("#priceerror").html(errors.price_err);
+                                    $("#propertyerror").html(errors.property_err);
+                                    $("#err").html(errors.err);
+                               }catch(error){
+                                    console.log('Error happened here!');
+                                    console.log(error);
+
+                               }
+
+                                if (!errors.sku_err && !errors.name_err && !errors.price_err  && !errors.property_err && !errors.err) 
+                                {
+                                    window.location.replace("http://localhost/firstPHPproject/Index.php");
+
+                                }
+                      
+                            }
+                        })
+
+                      
+                    })
+
+                });
+
     });
 
         </script>
